@@ -1,2 +1,2 @@
-# bbt.hti.508-teambloodpressure
-University course Health Software Development Project's implementation
+# BBT.HTI.508 Health Software Development Project
+This repository contains the project implementation for a university course Health Software Development Project. The project software is a simplified standalone programme that provides an interface for healthcare professionals to get an overview of the patient's condition relating to blood pressure values. This project will use provided private FHIR-based database to simulate blood pressure monitor data. The purpose of this project is to learn about health care systems, related standardisations and regulations.
