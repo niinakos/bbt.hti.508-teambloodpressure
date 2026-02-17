@@ -19,8 +19,8 @@ Installation:
    
 2. Create a virtual environment and activate it:
     ```
-    python -m venv venv
-    .venv\Scripts\activate
+    python -m venv .venv
+    .venv\Scripts\activate.bat
     ```
    
 3. Install the required dependencies:
