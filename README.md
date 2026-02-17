@@ -28,9 +28,16 @@ Installation:
     pip install -r requirements.txt
     ```
 
-4. Put the local JSON-database file "json_database.json" in the project to location
+4. Put the local JSON-database file "json_database.json" in the project to location:
     ```
-    bbt.hti.508-teambloodpressure\app\data\
+    bbt.hti.508-teambloodpressure\app\database\
     ```
 
+# Remember To
+
+1. ```Git pull``` the latest changes from the repository before starting to work on the project to avoid merge conflicts.
+2. ```Git status``` to check which files have been changed and need to be committed.
+2. ```Git add <file>```  your changes.
+3. ```Git commit -m "message"``` your changes with a descriptive message.
+4. ```Git push``` your changes to the repository at the end of the day.
 
