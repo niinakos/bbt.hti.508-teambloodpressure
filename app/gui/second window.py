@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 
 # Lisätty potilasnäkymä ja graafin pohja
 #laita def avaa_potilasikkuna(patient_id)
-def avaa_potilasikkuna():
-        uusi_ikkuna=tk.Toplevel()
-        uusi_ikkuna.title("Patient Detail View")
-        uusi_ikkuna.geometry("380X800")
-        uusi_ikkuna.configure(bg="#ffffff")
+#def avaa_potilasikkuna():
+uusi_ikkuna=tk.Toplevel()
+uusi_ikkuna.title("Patient Detail View")
+uusi_ikkuna.geometry("360x640")
+uusi_ikkuna.configure(bg="#ffffff")
 
 # Yläpalkki
 header=tk.Frame(uusi_ikkuna, bg="#d9d9d9", height=60)
@@ -57,7 +57,7 @@ risk_label.pack(anchor="w", padx=20, pady=10)
 detail_frame=tk.Frame(uusi_ikkuna, bg="#ffffff", highlightbackground="black", highlightthickness=1)
 detail_frame.pack(fill="x", padx=20, pady=10)
 
-stats = [("Gender", gender_from_FHIR), ("Age", f"{age_from_FHIR} years"),("Weight", "weight_from_FHIR"), ("BMI", "BMI_from_FHIR") ]
+stats = [("Gender", "gender_from_FHIR"), ("Age", f"age_from_FHIR years"),("Weight", "weight_from_FHIR"), ("BMI", "BMI_from_FHIR") ]
 for label, value in stats:
     f=tk.Frame(detail_frame, bg="#ffffff")
     f.pack(fill="x", padx=10, pady=2)
@@ -67,7 +67,8 @@ for label, value in stats:
 # Alapalkki
 footer=tk.Frame(uusi_ikkuna, bg="#d9d9d9", height=50)
 footer.pack(fill="x", side="bottom")
-tk-Label(footer, text="👤 Dr. John Doe", bg="#d9d9d9", font=("Arial", 10)).pack(side="left", padx=15, pady=10)
+tk.Label(footer, text="👤 Dr. John Doe", bg="#d9d9d9", font=("Arial", 10)).pack(side="left", padx=15, pady=10)
 
+uusi_ikkuna.mainloop()
 # Pääikkunan koodista pitää etsiä koodi 'button' ja muuttaa sen näin(?):
-# button=tk.Button(root, text="Patient Name", font=("Arial", 14), command=avaa_potilasikkuna
+# button=tk.Button(root, text="Patient Name", font=("Arial", 14), command=avaa_potilasikkuna)
