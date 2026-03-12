@@ -30,7 +30,7 @@ patients_label = tk.Label(info_frame, text="Patients\n95/495",
 patients_label.pack(side="left")
 
 badge = tk.Label(info_frame,
-                 text=" critical condition ",
+                 text="☹ critical condition ",
                  bg="#e53935", fg="white",
                  font=("Arial", 10))
 badge.pack(side="right")
