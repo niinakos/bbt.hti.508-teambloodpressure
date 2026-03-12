@@ -50,8 +50,13 @@ canvas.draw()
 canvas.get_tk_widget().pack(fill="x", padx=20)
 
 # Riski-ilmoitus
-risk_label = tk.Label(uusi_ikkuna, text="elevated hypertension risk", bg="#ffa726", fg="black", font=("Arial", 10), padx=10)
-risk_label.pack(anchor="w", padx=20, pady=10)
+# jos yli 65v, ja/tai BMI > 27, lähde:WHO, ja https://doi.org/10.1161/CIRCULATIONAHA.112.117333
+#määrittele muuttujat age ja BMI
+if age>64 or BMI > 26:
+    risk_label = tk.Label(uusi_ikkuna, text="elevated hypertension risk", bg="#ffa726", fg="black", font=("Arial", 10), padx=10)
+    risk_label.pack(anchor="w", padx=20, pady=10)
+else:
+    pass
 
 #Potilastiedot, taulukkomainen näkymä
 detail_frame=tk.Frame(uusi_ikkuna, bg="#ffffff", highlightbackground="black", highlightthickness=1)
