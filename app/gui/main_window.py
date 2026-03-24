@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, Text
 
 
 class MainWindow:
@@ -30,6 +30,9 @@ class MainWindow:
 
         self.search_entry = tk.Entry(search_frame, font=("Arial", 12))
         self.search_entry.pack(side="left", expand=True, padx=(0, 15), fill="x")
+        self.search_entry.bind("<KeyRelease>", self.on_search_entry_changed)
+
+        self.search_entry.focus()
 
         self.search_button = tk.Button(search_frame, text="Search", command=self.on_search_clicked)
         self.search_button.pack(side="right", padx=15)
@@ -79,11 +82,9 @@ class MainWindow:
             lambda e: self.canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"),
         )
 
-        patient_ids = self.controller.get_patient_ids()
+        self.patient_ids = self.controller.get_patient_ids()
 
-
-        for id in patient_ids:
-            self.create_patient(self.controller.get_patient_name(id), id)
+        self.show_all_patients()
 
         bottom = tk.Frame(self.root, bg="#d9d9d9", height=60)
         bottom.pack(fill="x")
@@ -123,12 +124,51 @@ class MainWindow:
         )
         id_label.pack(anchor="w", padx=10, pady=(0, 8))
 
+    def show_all_patients(self):
+        for widget in self.scrollable_frame.winfo_children():
+            widget.destroy()
+
+        for patient_id in self.patient_ids:
+            self.create_patient(self.controller.get_patient_name(patient_id), patient_id)
+
+    def update_patients(self):
+        for widget in self.scrollable_frame.winfo_children():
+            widget.destroy()
+
+        patient_id = self.search_entry.get().strip()
+
+        for p_id in self.patient_ids:
+            if p_id == patient_id:
+                self.create_patient(self.controller.get_patient_name(patient_id), patient_id)
+            else:
+                error = tk.Label(
+                    self.scrollable_frame,
+                    text="No patient found with that ID.",
+                    font=("Arial", 11),
+                    bg="#e5e5e5",
+                )
+                error.pack(pady=20)
+
+                return
+
     def on_click(self, event):
         print("Clicked koira")
 
     def on_search_clicked(self):
-        query = self.search_entry.get()
+        query = self.search_entry.get().strip()
+        if query == "":
+            self.show_all_patients()
+        else:
+            self.update_patients()
+
         print(f"Search for: {query}")
+
+    def on_search_entry_changed(self, event):
+        query = self.search_entry.get().strip()
+        if query == "":
+            self.show_all_patients()
+        else:
+            return
 
     def run(self):
         self.root.mainloop()
