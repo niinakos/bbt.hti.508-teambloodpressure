@@ -3,8 +3,11 @@ class DataController:
     def __init__(self, service):
         self.service = service
 
+    def get_patient_ids(self):
+        return self.service.get_patient_ids()
+
     def get_patient_data(self):
         self.service.get_patient_data()
 
-    def get_patient_name(self):
-        return self.service.get_patient_name(self.service.patient_json, '665677', "http://tutsgnfhir.com")
+    def get_patient_name(self, patient_id):
+        return self.service.get_patient_name(self.service.patient_json, patient_id, "http://tutsgnfhir.com")

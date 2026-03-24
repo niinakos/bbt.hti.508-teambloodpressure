@@ -3,7 +3,11 @@ class DataService:
     def __init__(self, repository):
         self.repository = repository
         self.patient_json = self.repository.load()
+        self.patient_ids = self.repository.save(self.patient_json)
         # self.id_list = self.repository.save(self.patient_json)
+
+    def get_patient_ids(self):
+        return self.patient_ids
 
     @staticmethod
     def get_patient_data(patient_json, patient_id, fullUrl):
@@ -24,3 +28,9 @@ class DataService:
                 surname = resource_patient['name'][0]['family'][0]
 
                 return given, surname
+
+    # haetaan sys ja dia päivämäärien mukaan (syke?)
+
+    # haetaan syke
+
+    #
