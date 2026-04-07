@@ -1,6 +1,5 @@
 from operator import truediv
 
-
 def graph(patient, start_date, end_date):
     #get data from patient_json by patientID
     #POTILASID PITÄISI VALIKOITUA AUTOMAATTISESTI KUN OLLAAN POTILASSIVULLA
@@ -23,7 +22,37 @@ def graph(patient, start_date, end_date):
     #figure
     fig = plt.figure(figsize=(12, 6))
 
-    #MITEN PVM SÄÄDETÄÄN?
+    #date picker
+    import tkinter as tk
+    from tkcalendar import DateEntry
+
+    def get_dates():
+        start = start_date.get_date()
+        end = end_date.get_date()
+
+        if start > end:
+            result_label.config(text="Start date cannot be after end date")
+        else:
+            result_label.config(text=f"Start: {start} | End: {end}")
+
+    root = tk.Tk()
+    root.title("Date Range Picker")
+
+    tk.Label(root, text="Start Date").pack()
+    start_date = DateEntry(root, width=12)
+    start_date.pack()
+
+    tk.Label(root, text="End Date").pack()
+    end_date = DateEntry(root, width=12)
+    end_date.pack()
+
+    tk.Button(root, text="Submit", command=get_dates).pack()
+
+    result_label = tk.Label(root, text="")
+    result_label.pack()
+
+    root.mainloop()
+
     #blood pressure
     plt.scatter(date_list, sys_bp_list, label="Systolic blood pressure")
     plt.scatter(date_list, dia_bp_list, label="Diastolic blood pressure")
