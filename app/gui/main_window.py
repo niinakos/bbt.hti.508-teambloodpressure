@@ -102,6 +102,13 @@ class MainWindow:
         )
         card.pack(fill="x", padx=10, pady=8)
         card.bind("<Button-1>", lambda e: PatientDetailView(self.controller, patient_id))
+        def on_enter(e):
+            card.configure(bg="#f0f0f0")
+        def on_leave(e):
+            card.configure(bg="white")
+
+        card.bind("<Enter>", on_enter)
+        card.bind("<Leave>", on_leave)
 
         name_label = tk.Label(
             card,
@@ -119,10 +126,23 @@ class MainWindow:
         )
         id_label.pack(anchor="w", padx=10, pady=(0, 8))
 
+        if self.controller.is_patient_critical(patient_id):
+            critical_mark = tk.Label(
+                card,
+                text="●",
+                bg="white",
+                fg="red",
+                font=("Arial", 14, "bold"),
+            )
+            critical_mark.pack(side="right")
+
     def show_all_patients(self):
         for widget in self.scrollable_frame.winfo_children():
             widget.destroy()
-
+        #for patient_id in self.patient_ids:
+            #systolic, diastolic = self.controller.get_patient_blood_pressure(patient_id)
+            #critical = self.controller.is_patient_critical(patient_id)
+            #print(patient_id, systolic, diastolic, critical)
         # TODO: Check for duplicate patient IDs
         for patient_id in self.patient_ids:
             self.create_patient(self.controller.get_patient_name(patient_id), patient_id)
@@ -136,6 +156,7 @@ class MainWindow:
             widget.destroy()
 
         patient_id = self.search_entry.get().strip()
+
 
         for p_id in self.patient_ids:
             if p_id == patient_id:
