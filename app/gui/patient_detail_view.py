@@ -1,4 +1,6 @@
 import tkinter as tk
+from tkinter import messagebox
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 
@@ -30,6 +32,19 @@ class PatientDetailView:
         name_frame.pack(side="left", padx=10)
         tk.Label(name_frame,text=self.controller.get_patient_name(self.patient_id), font=("Arial", 14, "bold"), bg="#ffffff").pack(anchor="w")
         tk.Label(name_frame, text=self.patient_id, font=("Arial", 10), fg="gray", bg="#ffffff").pack(anchor="w")
+
+        # REFERENCE VALUES -nappi
+        reference_btn = tk.Button(
+           self.toplevel,
+           text="Reference\nvalues",
+           compound="top",
+           font=("Arial", 9),
+           fg="black",
+           bg="white",
+           relief="flat",
+           cursor="hand2",
+           command=self.avaa_viitearvot)
+        reference_btn.place(x=270, y=70)
 
         # Kriittinen tila
         alert_badge = tk.Label(self.toplevel, text="☹ critical condition", bg="#e53935", fg="white", font=("Arial", 11, "bold"), pady=5)
@@ -81,7 +96,29 @@ class PatientDetailView:
         footer.pack(fill="x", side="bottom")
         tk.Label(footer, text="👤 Dr. John Doe", bg="#d9d9d9", font=("Arial", 10)).pack(side="left", padx=15, pady=10)
 
+     def avaa_viitearvot(self):
+        asetus_ikkuna = tk.Toplevel(self.toplevel)
+        asetus_ikkuna.title("Set Reference Values")
+        asetus_ikkuna.geometry("250x220")
+
+        tk.Label(asetus_ikkuna, text="Critical Systolic:", font=("Arial", 10)).pack(pady=5)
+        sys_entry = tk.Entry(asetus_ikkuna)
+        sys_entry.pack()
+
+        tk.Label(asetus_ikkuna, text="Critical Diastolic:", font=("Arial", 10)).pack(pady=5)
+        dia_entry = tk.Entry(asetus_ikkuna)
+        dia_entry.pack()
+
+        tk.Button(asetus_ikkuna, text="Save", command=lambda: self.tallenna_arvot(sys_entry, dia_entry), bg="#d9d9d9").pack(pady=20)
+
+     def tallenna_arvot(self, sys_entry, dia_entry):
+        try:
+           sys_limit = int(sys_entry.get())
+           dia_limit = int(dia_entry.get())
+           messagebox.showinfo("Saved", f"New reference values: {sys_limit}/{dia_limit}")
+           self.toplevel.destroy()
+        except ValueError:
+           messagebox.showerror("Error", "Give numbers only!")
+
      def run(self):
         self.toplevel.mainloop()
-        # Pääikkunan koodista pitää etsiä koodi 'button' ja muuttaa sen näin(?):
-        # button=tk.Button(root, text="Patient Name", font=("Arial", 14), command=avaa_potilasikkuna)
