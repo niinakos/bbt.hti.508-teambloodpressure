@@ -17,3 +17,12 @@ class DataController:
 
     def is_patient_critical(self, patient_id):
         return self.service.is_patient_critical(patient_id)
+
+    def get_bmi(self, patient_id):
+        return self.service.get_bmi(patient_id)
+
+    def get_age(self, patient_id):
+        return self.service.get_age(patient_id)
+
+    def is_hypertension_risk(self, patient_id):
+        return self.service.is_hypertension_risk(patient_id)

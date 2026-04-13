@@ -5,9 +5,11 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 
 class PatientDetailView:
-     def __init__(self, controller, patient_id):
+     def __init__(self, controller, patient_id, get_bmi, get_age):
         self.patient_id = patient_id
         self.controller = controller
+        self.controller.get_bmi = get_bmi
+        self.controller.get_age = get_age
 
         # Lisätty potilasnäkymä ja graafin pohja
         #laita def avaa_potilasikkuna(patient_id)
@@ -69,12 +71,10 @@ class PatientDetailView:
         canvas.get_tk_widget().pack(fill="x", padx=20)
 
 
-        age = 18
-        BMI = 25
+
         # Riski-ilmoitus
         # jos yli 65v, ja/tai BMI > 27, lähde:WHO, ja https://doi.org/10.1161/CIRCULATIONAHA.112.117333
-        #määrittele muuttujat age ja BMI
-        if age>64 or BMI > 26:
+        if self.controller.is_hypertension_risk(patient_id):
             risk_label = tk.Label(self.toplevel, text="elevated hypertension risk", bg="#ffa726", fg="black", font=("Arial", 10), padx=10)
             risk_label.pack(anchor="w", padx=20, pady=10)
         else:

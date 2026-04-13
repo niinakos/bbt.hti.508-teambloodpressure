@@ -88,4 +88,96 @@ class DataService:
 
     # haetaan syke
 
-    #
+    # haetaan BMI
+    def get_bmi(self, patient_id):
+        bmi = None
+
+        for entry in self.patient_json:
+            if isinstance(entry, list):
+                items = entry
+            elif isinstance(entry, dict):
+                items = [entry]
+            else:
+                continue
+
+            for item in items:
+                resource = item.get("resource", {})
+
+                if resource.get("resourceType") != "Observation":
+                    continue
+
+                subject_ref = resource.get("subject", {}).get("reference")
+                if subject_ref != f"Patient/{patient_id}":
+                    continue
+
+                coding = resource.get("code", {}).get("coding", [])
+                if not coding:
+                    continue
+
+                code = coding[0].get("code")
+                value = resource.get("valueQuantity", {}).get("value")
+                date = resource.get("effectiveDateTime")
+
+                if value is None or date is None:
+                    continue
+                if latest_date is None or date > latest_date:
+                    latest_date = date
+                # bmi
+                if code == "39156-5":
+                    bmi = value
+
+
+        return bmi
+
+    # haetaan ikä
+    from datetime import datetime
+
+    def get_age(self, patient_id):
+        for entry in self.patient_json:
+            if isinstance(entry, list):
+                items = entry
+            elif isinstance(entry, dict):
+                items = [entry]
+            else:
+                continue
+
+            for item in items:
+                resource = item.get("resource", {})
+
+                # Etsitään Patient-resurssi
+                if resource.get("resourceType") != "Patient":
+                    continue
+
+                # Match id (string vs int varmistus)
+                if str(resource.get("id")) != str(patient_id):
+                    continue
+
+                birth_date_str = resource.get("birthDate")
+                if not birth_date_str:
+                    return None
+
+                try:
+                    birth_date = datetime.strptime(birth_date_str, "%Y-%m-%d").date()
+                    today = datetime.today().date()
+
+                    age = today.year - birth_date.year - (
+                        (today.month, today.day) < (birth_date.month, birth_date.day)
+                    )
+
+                    return age
+
+                except ValueError:
+                    return None
+
+        return None
+
+    # is_hypertension_risk
+    def is_hypertension_risk(self, patient_id):
+        age = self.get_age(patient_id)
+        bmi = self.get_bmi(patient_id)
+
+        if age is None or bmi is None:
+            return False
+
+        else:
+            return True
