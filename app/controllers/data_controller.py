@@ -4,7 +4,7 @@ class DataController:
         self.service = service
 
     def get_patient_ids(self):
-        return self.service.get_patient_ids()
+        return list(dict.fromkeys(self.service.get_patient_ids()))
 
     def get_patient_data(self):
         self.service.get_patient_data()

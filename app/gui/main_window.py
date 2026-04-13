@@ -13,6 +13,7 @@ class MainWindow:
 
         header = tk.Frame(self.root, bg="#d9d9d9", height=60)
         header.pack(fill="x")
+        header.pack_propagate(False)
 
         title = tk.Label(
             header,
@@ -20,8 +21,23 @@ class MainWindow:
             bg="#d9d9d9",
             font=("Arial", 14, "bold"),
         )
-        title.pack(padx=20, pady=20)
+        title.pack(side="left", padx=20, pady=15)
 
+        self.filter_var = tk.StringVar(value="All")
+
+        self.filter_button = tk.Button(
+            header,
+            text= "☰",
+            font=("Arial", 10),
+            relief="flat",
+            command=self.show_filter_menu,
+
+        )
+        self.filter_button.pack(side="right", padx=20, pady=15)
+
+        self.filter_menu = tk.Menu(self.root, tearoff=0)
+        self.filter_menu.add_command(label="All", command=lambda: self.set_filter("All"))
+        self.filter_menu.add_command(label="Critical", command=lambda: self.set_filter("Critical"))
         search_frame = tk.Frame(self.root, bg="#e5e5e5", pady=10)
         search_frame.pack(fill="x")
 
@@ -137,46 +153,78 @@ class MainWindow:
             critical_mark.pack(side="right")
 
     def show_all_patients(self):
-        for widget in self.scrollable_frame.winfo_children():
-            widget.destroy()
+        #for widget in self.scrollable_frame.winfo_children():
+            #widget.destroy()
         #for patient_id in self.patient_ids:
             #systolic, diastolic = self.controller.get_patient_blood_pressure(patient_id)
             #critical = self.controller.is_patient_critical(patient_id)
             #print(patient_id, systolic, diastolic, critical)
         # TODO: Check for duplicate patient IDs
-        for patient_id in self.patient_ids:
-            self.create_patient(self.controller.get_patient_name(patient_id), patient_id)
+        #for patient_id in self.patient_ids:
+            #self.create_patient(self.controller.get_patient_name(patient_id), patient_id)
+
+        #self.root.update_idletasks()
+        #self.canvas.yview_moveto(0.0)
+        #self._update_scroll_state()
+        self.show_filtered_patients()
+
+    def update_patients(self):
+        for widget in self.scrollable_frame.winfo_children():
+            widget.destroy()
+        query = self.search_entry.get().strip().lower()
+        selected_filter = self.filter_var.get()
+        count = 0
+
+
+        for p_id in self.patient_ids:
+
+            name = self.controller.get_patient_name(p_id)
+
+            if isinstance(name, tuple):
+                    name_str = " ".join(name).lower()
+            else:
+                    name_str = str(name).lower()
+
+            matches_search = query in p_id.lower() or query in name_str
+
+            if not matches_search:
+                    continue
+
+            if selected_filter == "Critical" and not self.controller.is_patient_critical(p_id):
+                    continue
+
+            self.create_patient(name, p_id)
+            count += 1
+
+        if count == 0:
+            error = tk.Label(
+                self.scrollable_frame,
+                text="No patient found.",
+                font=("Arial", 11),
+                bg="#e5e5e5",
+            )
+            error.pack(pady=20)
+
+        self.patients_label.config(text=f"{count}/{len(self.patient_ids)} Patient{'s' if count != 1 else ''}")
 
         self.root.update_idletasks()
         self.canvas.yview_moveto(0.0)
         self._update_scroll_state()
 
-    def update_patients(self):
-        for widget in self.scrollable_frame.winfo_children():
-            widget.destroy()
+    def show_filter_menu(self):
+        x = self.filter_button.winfo_rootx()
+        y = self.filter_button.winfo_rooty() + self.filter_button.winfo_height()
+        self.filter_menu.tk_popup(x, y)
 
-        patient_id = self.search_entry.get().strip()
+    def set_filter(self, value):
+        self.filter_var.set(value)
+        self.filter_button.config(text=f"☰")
 
-
-        for p_id in self.patient_ids:
-            if p_id == patient_id:
-                self.create_patient(self.controller.get_patient_name(patient_id), patient_id)
-
-                self.root.update_idletasks()
-                self.canvas.yview_moveto(0.0)
-                self._update_scroll_state()
-
-                self.patients_label.config(text=f"1 Patient")
-                return
-
-        error = tk.Label(
-            self.scrollable_frame,
-            text="No patient found with given ID.",
-            font=("Arial", 11),
-            bg="#e5e5e5",
-        )
-        error.pack(pady=20)
-
+        query = self.search_entry.get().strip()
+        if query == "":
+            self.show_filtered_patients()
+        else:
+            self.update_patients()
 
     def on_click(self, event):
         print("Clicked koira")
@@ -193,7 +241,7 @@ class MainWindow:
         if query == "":
             self.show_all_patients()
         else:
-            return
+            self.update_patients()
 
         # TODO: Implement real-time search filtering here if desired
 
@@ -216,6 +264,29 @@ class MainWindow:
         if not self.scroll_enabled:
             return
         self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    def on_filter_changed(self, event=None):
+        query=self.search_entry.get().strip()
+        if query== "":
+            self.show_filtered_patients()
+        else:
+            self.update_patients()
+
+    def show_filtered_patients(self):
+        for widget in self.scrollable_frame.winfo_children():
+            widget.destroy()
+        selected_filter=self.filter_var.get()
+        count=0
+        for patient_id in self.patient_ids:
+            if selected_filter == "Critical" and not self.controller.is_patient_critical(patient_id):
+                continue
+            self.create_patient(self.controller.get_patient_name(patient_id),patient_id)
+            count+=1
+        self.patients_label.config(text=f"{count}/{len(self.patient_ids)} Patient{'s' if count != 1 else ''}")
+        self.root.update_idletasks()
+        self.canvas.yview_moveto(0.0)
+        self._update_scroll_state()
+
 
     def run(self):
         self.root.mainloop()
