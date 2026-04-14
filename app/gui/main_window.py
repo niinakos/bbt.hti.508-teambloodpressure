@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from app.gui.patient_detail_view import PatientDetailView
+from PIL import Image, ImageTk
 
 class MainWindow:
     def __init__(self, controller):
@@ -25,16 +26,20 @@ class MainWindow:
 
         self.filter_var = tk.StringVar(value="All")
 
+
+        img = Image.open("C:/Users/lotta/OneDrive/Tiedostot/dippa 1vsk/health sofware/bbt.hti.508-teambloodpressure/app/assets/filter.png")
+        img = img.resize((24, 24))  # tai (28, 28)
+
+        self.filter_icon = ImageTk.PhotoImage(img)
+
         self.filter_button = tk.Button(
             header,
-            text= "☰",
-            font=("Arial", 10),
+            image=self.filter_icon,
+            bg="#d9d9d9",
             relief="flat",
             command=self.show_filter_menu,
-
         )
         self.filter_button.pack(side="right", padx=20, pady=15)
-
         self.filter_menu = tk.Menu(self.root, tearoff=0)
         self.filter_menu.add_command(label="All", command=lambda: self.set_filter("All"))
         self.filter_menu.add_command(label="Critical", command=lambda: self.set_filter("Critical"))
