@@ -5,11 +5,10 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 
 class PatientDetailView:
-     def __init__(self, controller, patient_id, get_bmi, get_age):
+     def __init__(self, controller, patient_id):
         self.patient_id = patient_id
         self.controller = controller
-        self.controller.get_bmi = get_bmi
-        self.controller.get_age = get_age
+
 
         # Lisätty potilasnäkymä ja graafin pohja
         #laita def avaa_potilasikkuna(patient_id)
@@ -49,22 +48,42 @@ class PatientDetailView:
         reference_btn.place(x=270, y=70)
 
         # Kriittinen tila
-        alert_badge = tk.Label(self.toplevel, text="☹ critical condition", bg="#e53935", fg="white", font=("Arial", 11, "bold"), pady=5)
-        alert_badge.pack(fill="x", padx=40, pady=10)
+        if self.controller.is_patient_critical(patient_id):
+            alert_badge = tk.Label(self.toplevel, text="☹ critical condition", bg="#e53935", fg="white", font=("Arial", 11, "bold"), pady=5)
+            alert_badge.pack(fill="x", padx=40, pady=10)
 
         # Graafi (matplotlib)
         tk.Label(self.toplevel, text="Tracking history", bg="#ffffff", font=("Arial", 10, "bold")).pack()
 
         # Simuloitu graafi
         fig, ax = plt.subplots(figsize=(4, 3), dpi=80)
-        dates = ["Apr 1", "Apr 3", "Apr 5", "Apr 7", "Apr 9"]
-        systolic = [120, 135, 125, 140, 155]
-        diastolic = [80, 85, 82, 90, 105]
 
-        ax.plot(dates, systolic, 'kv-', label="Sys")
-        ax.plot(dates, diastolic, 'k^-', label="Dia")
-        ax.set_ylim(40, 200)
-        ax.grid(True, axis='y', linestyle='--', alpha=0.7)
+        history = self.controller.get_patient_blood_pressure_history(self.patient_id)
+        history = history[-7:]
+        print("PATIENT:", self.patient_id)
+        print("HISTORY:", history)
+        fig, ax = plt.subplots(figsize=(4, 3), dpi=80)
+
+        if history:
+            dates = [item["date"] for item in history]
+            systolic = [item["systolic"] for item in history]
+            diastolic = [item["diastolic"] for item in history]
+
+            ax.plot(dates, systolic, 'kv-', label="Sys")
+            ax.plot(dates, diastolic, 'k^-', label="Dia")
+            ax.set_ylim(10, 200)
+            ax.grid(True, axis='y', linestyle='--', alpha=0.7)
+            ax.legend()
+            ax.set_ylabel("mmHg")
+            ax.set_xlabel("Date")
+
+            # jos päivämääriä paljon, käännä tekstit
+            plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
+        else:
+            ax.text(0.5, 0.5, "No blood pressure data", ha="center", va="center")
+            ax.set_axis_off()
+
+        fig.tight_layout()
 
         canvas = FigureCanvasTkAgg(fig, master=self.toplevel)
         canvas.draw()
@@ -84,7 +103,15 @@ class PatientDetailView:
         detail_frame=tk.Frame(self.toplevel, bg="#ffffff", highlightbackground="black", highlightthickness=1)
         detail_frame.pack(fill="x", padx=20, pady=10)
 
-        stats = [("Gender", "gender_from_FHIR"), ("Age", f"age_from_FHIR years"),("Weight", "weight_from_FHIR"), ("BMI", "BMI_from_FHIR") ]
+
+        age= self.controller.get_age(self.patient_id)
+        bmi=self.controller.get_bmi(self.patient_id)
+        gender= self.controller.get_gender(self.patient_id)
+        stats = [
+            ("Age", f"{age} years"),
+            ("BMI", bmi),
+            ("Gender", gender),
+        ]
         for label, value in stats:
             f=tk.Frame(detail_frame, bg="#ffffff")
             f.pack(fill="x", padx=10, pady=2)

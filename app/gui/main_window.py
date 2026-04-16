@@ -43,6 +43,7 @@ class MainWindow:
         self.filter_menu = tk.Menu(self.root, tearoff=0)
         self.filter_menu.add_command(label="All", command=lambda: self.set_filter("All"))
         self.filter_menu.add_command(label="Critical", command=lambda: self.set_filter("Critical"))
+        self.filter_menu.add_command(label="Elevated hypertension risk", command=lambda: self.set_filter("Elevated hypertension risk"))
         search_frame = tk.Frame(self.root, bg="#e5e5e5", pady=10)
         search_frame.pack(fill="x")
 
@@ -197,6 +198,9 @@ class MainWindow:
 
             if selected_filter == "Critical" and not self.controller.is_patient_critical(p_id):
                     continue
+            elif selected_filter == "Elevated hypertension risk":
+                if not self.controller.is_hypertension_risk(p_id):
+                    continue
 
             self.create_patient(name, p_id)
             count += 1
@@ -285,6 +289,9 @@ class MainWindow:
         for patient_id in self.patient_ids:
             if selected_filter == "Critical" and not self.controller.is_patient_critical(patient_id):
                 continue
+            elif selected_filter == "Elevated hypertension risk":
+                if not self.controller.is_hypertension_risk(patient_id):
+                    continue
             self.create_patient(self.controller.get_patient_name(patient_id),patient_id)
             count+=1
         self.patients_label.config(text=f"{count}/{len(self.patient_ids)} Patient{'s' if count != 1 else ''}")

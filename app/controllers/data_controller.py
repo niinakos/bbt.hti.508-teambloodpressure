@@ -23,6 +23,11 @@ class DataController:
 
     def get_age(self, patient_id):
         return self.service.get_age(patient_id)
+    def get_gender(self, patient_id):
+        return self.service.get_gender(patient_id)
 
     def is_hypertension_risk(self, patient_id):
         return self.service.is_hypertension_risk(patient_id)
+
+    def get_patient_blood_pressure_history(self, patient_id):
+        return self.service.get_patient_blood_pressure_history(patient_id)

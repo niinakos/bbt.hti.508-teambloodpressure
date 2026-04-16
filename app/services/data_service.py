@@ -1,3 +1,4 @@
+from datetime import datetime
 class DataService:
 
     def __init__(self, repository):
@@ -91,6 +92,7 @@ class DataService:
     # haetaan BMI
     def get_bmi(self, patient_id):
         bmi = None
+        latest_date=None
 
         for entry in self.patient_json:
             if isinstance(entry, list):
@@ -130,7 +132,7 @@ class DataService:
         return bmi
 
     # haetaan ikä
-    from datetime import datetime
+
 
     def get_age(self, patient_id):
         for entry in self.patient_json:
@@ -171,13 +173,96 @@ class DataService:
 
         return None
 
+    def get_gender(self, patient_id):
+        for entry in self.patient_json:
+            if isinstance(entry, list):
+                items = entry
+            elif isinstance(entry, dict):
+                items = [entry]
+            else:
+                continue
+
+            for item in items:
+                resource = item.get("resource", {})
+
+                # Etsitään Patient-resurssi
+                if resource.get("resourceType") != "Patient":
+                    continue
+                if str(resource.get("id")) != str(patient_id):
+                    continue
+                gender = resource.get("gender")
+                if not gender:
+                    return None
+
+
+                return gender
+        return None
+
+
     # is_hypertension_risk
     def is_hypertension_risk(self, patient_id):
         age = self.get_age(patient_id)
         bmi = self.get_bmi(patient_id)
-
-        if age is None or bmi is None:
+        systolic, diastolic = self.get_patient_blood_pressure(patient_id)
+        if age is None or bmi is None or systolic is None or diastolic is None:
             return False
-
-        else:
+        if age > 65 and (systolic >= 130 or diastolic >= 80):
             return True
+
+        if bmi > 27 and (systolic >= 130 or diastolic >= 80):
+            return True
+        if systolic >= 140 or diastolic >= 90:
+            return True
+        return False
+
+    def get_patient_blood_pressure_history(self, patient_id):
+        readings = {}
+
+        for entry in self.patient_json:
+            if isinstance(entry, list):
+                items = entry
+            elif isinstance(entry, dict):
+                items= [entry]
+            else:
+                continue
+            for item in items:
+                resource= item.get("resource", {})
+                if resource.get("resourceType") != "Observation":
+                    continue
+                subject_ref = resource.get("subject", {}).get("reference")
+                if subject_ref != f"Patient/{patient_id}":
+                    continue
+
+                coding = resource.get("code", {}).get("coding", [])
+                if not coding:
+                    continue
+
+                code = coding[0].get("code")
+                if code not in ("8480-6", "8462-4"):
+                    continue
+
+                value= resource.get("valueQuantity", {}).get("value")
+                date= resource.get("effectiveDateTime")
+
+                if value is None or date is None:
+                    continue
+
+                if code not in ("8480-6", "8462-4"):
+                    continue
+
+                if date not in readings:
+                    readings[date] = {
+                        "date": date,
+                        "systolic": None,
+                        "diastolic": None,
+                    }
+
+                if code == "8480-6":
+                    readings[date]["systolic"] = value
+                elif code == "8462-4":
+                    readings[date]["diastolic"] = value
+
+        result = list(readings.values())
+        result.sort(key=lambda x: x["date"])
+
+        return result
